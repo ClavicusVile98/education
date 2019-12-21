@@ -4,7 +4,7 @@ Laba-AAA.md
 
 **Создание пользователей**
 
-![20a08d4ef158d1d4100f553aa33a85db.png](../_resources/72cb7f867e354cfd8c40626bd6686262.png)
+![1.png](D:/Linux/1.png)
 
 UID user1 1001
 UID user2 1002
