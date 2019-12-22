@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <link type = 'text/css' rel = 'stylesheet' media = 'all' href = 'file.css'/>
+    <link type = "text/css" rel = "stylesheet" media = "all" href = "file.css"/>
     <body>
       
   <p><b>Репозиторий Воловичевой Надежды. Группа М3О-117М-19.</b></p>
