@@ -4,7 +4,7 @@ Laba-AAA.md
 
 **Создание пользователей**
 
-![1.png](../1.png)
+![1.png](1.png)
 
 UID user1 1001
 UID user2 1002
