@@ -78,8 +78,9 @@ UID user2 1002
 
 **Запись в sudoers**
 
+![17.png](./images/17.png)
 
+![18.png](./images/18.png)
 
-???
 
 
