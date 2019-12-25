@@ -1,6 +1,6 @@
 Laba-processes
 
-## Lab-process
+## Lab-processes
 
 
 **1. Дисковые устройства и партиции**
