@@ -70,3 +70,14 @@ Exception raised:
 4 passed and 2 failed.
 ***Test Failed*** 2 failures.
 
+======================================================================
+Test assert
+
+D:/Python/lab_3_test.py
+Traceback (most recent call last):
+  File "D:/Python/lab_3_test.py", line 107, in <module>
+    assert msg == dec, err_msg
+AssertionError: MAI-PYTHON-2019 != HIGHLOAD?
+
+Process finished with exit code 1
+
