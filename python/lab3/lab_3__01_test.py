@@ -99,9 +99,10 @@ def decode(morse_message: str) -> str:
 
 if __name__ == '__main__':
     msg = 'MAI-PYTHON-2019'
-    encoded_msg = '.... .. --. .... .-.. --- .- -.. ..--..'
+    decoded_msg = '.... .. --. .... .-.. --- .- -.. ..--..'
     # print(decoded_msg)
-    err_msg = f'{msg} != {encoded_msg}'
+    dec = decode(decoded_msg)
+    err_msg = f'{msg} != {dec}'
 
-    assert msg == encode(encoded_msg), err_msg
+    assert msg == dec, err_msg
     doctest.testmod()
