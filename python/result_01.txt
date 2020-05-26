@@ -1,0 +1,72 @@
+(venv) D:\Python>python -m doctest -v -o NORMALIZE_WHITESPACE lab_3.py
+Trying:
+    decode('.-.-.-_')
+Expecting:
+    '.'
+**********************************************************************
+File "D:\Python\lab_3.py", line 81, in lab_3.decode
+Failed example:
+    decode('.-.-.-_')
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python37_64\lib\doctest.py"
+, line 1329, in __run
+        compileflags, 1), test.globs)
+      File "<doctest lab_3.decode[0]>", line 1, in <module>
+        decode('.-.-.-_')
+      File "D:\Python\lab_3.py", line 87, in decode
+        MORSE_TO_LETTER[letter] for letter in morse_message.split()
+      File "D:\Python\lab_3.py", line 87, in <listcomp>
+        MORSE_TO_LETTER[letter] for letter in morse_message.split()
+    KeyError: '.-.-.-_'
+Trying:
+    decode('..... -....- --... -....- -.--. ...-- -..-. .---- -.--.-')
+Expecting:
+    '5-7-(3/1)'
+ok
+Trying:
+    encode('SOS')
+Expecting:
+    '... --- ...'
+ok
+Trying:
+    encode('HIGHLOAD')
+Expecting:
+    '.... .. --. .... .-.. --- .- -..'
+ok
+Trying:
+    encode('HOW MANY TIMES I SLEPT?')
+Expecting:
+    '.... --- .-- -- .- -. -.-- - ..
+    -- . ... .. ... .-.. . .--. - ..--..'
+ok
+Trying:
+    encode('Аннушка уже разлила масло...') #doctest: +ELLIPSIS
+Expecting:
+    '.-.-.- .-.-.-'
+**********************************************************************
+File "D:\Python\lab_3.py", line 68, in lab_3.encode
+Failed example:
+    encode('Аннушка уже разлила масло...') #doctest: +ELLIPSIS
+Exception raised:
+    Traceback (most recent call last):
+      File "C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python37_64\lib\doctest.py"
+, line 1329, in __run
+        compileflags, 1), test.globs)
+      File "<doctest lab_3.encode[3]>", line 1, in <module>
+        encode('Аннушка уже разлила масло...') #doctest: +ELLIPSIS
+      File "D:\Python\lab_3.py", line 72, in encode
+        LETTER_TO_MORSE[letter] for letter in message
+      File "D:\Python\lab_3.py", line 72, in <listcomp>
+        LETTER_TO_MORSE[letter] for letter in message
+    KeyError: 'А'
+1 items had no tests:
+    lab_3
+**********************************************************************
+2 items had failures:
+   1 of   2 in lab_3.decode
+   1 of   4 in lab_3.encode
+6 tests in 3 items.
+4 passed and 2 failed.
+***Test Failed*** 2 failures.
+
