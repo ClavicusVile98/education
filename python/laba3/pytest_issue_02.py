@@ -74,7 +74,8 @@ def test_decode(msg, exp):
     assert decode(msg) == exp
 
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
+    pytest.main()
 # msg = '-- .- .. -....- .--. -.-- - .... --- -. -....- ..--- ----- .---- ----.'
 # decoded_msg = decode(msg)
 # print(decoded_msg)
