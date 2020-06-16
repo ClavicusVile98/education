@@ -6,169 +6,112 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	//common "common"
 )
 
-const multiHashSubHashes = 6
+func ExecutePipeline(hashSignJobs ...job){
+	/* инициализация WaitGroup,
+	 * не надо копировать,
+	 * поэтому используется указатель*/
+	wg := &sync.WaitGroup{}
 
-type HashNode struct {
-	id int
-	value string
+	/* считывание данных в буферизированный канал */
+	workerInput := make(chan interface{}, MaxInputDataLen) /* неэкспортируемая переменная */
+	/* вывести данные в буферизированный канал */
+	workerOutput := make(chan interface{}, MaxInputDataLen) /* неэкспортируемая переменная */
+
+	for _, myjob := range hashSignJobs {
+		wg.Add(1)
+		/* запуск горутины */
+		go func(workerInput, workerOutput chan interface{}, jfunc job){
+			/* ждем, когда воркер закончит работу */
+			defer wg.Done()
+			/* ждем закрытия канала */
+			defer close(workerOutput)
+			jfunc(workerInput, workerOutput)
+		}(workerInput, workerOutput, myjob)
+		workerInput = workerOutput
+	}
+	/* ожидаем, пока не отработает горутина*/
+	wg.Wait()
 }
 
-func SingleHash(in, out chan interface{}) {
-	var wg sync.WaitGroup
-	singleHashCh := make(chan string)
+func SingleHash(workerInput, workerOutput chan interface{}) {
+	wg := &sync.WaitGroup{}
+	mu := &sync.Mutex{}
 
-	for input := range in {
+	for item := range workerInput {
+		digit := strconv.Itoa(item.(int))
+		//data := fmt.Sprint(digit)
 		wg.Add(1)
 
-		inputAsString := strconv.Itoa(convertToInt(input))
-		md5 := DataSignerMd5(inputAsString)
+		/* горутина */
+		// workerOutput chan interface{}, wg *sync.WaitGroup, mu *sync.Mutex,
+		go func(digit string) {
+			defer wg.Done()
+			var CRC32 string // объявление переменных
+			var CRC32MD5 string
+			wgCRC := &sync.WaitGroup{}
+			wgCRC.Add(1)
 
-		go calculateSingleHashSum(&wg, singleHashCh, inputAsString, md5)
-	}
+			/* еще одна горутина */
+			go func() {
+				defer wgCRC.Done()
+				mu.Lock() // сначала блокируем, чтобы другие не стучались
+				MD5 := DataSignerMd5(digit)
+				mu.Unlock() // затем разблокировали, чтобы можно было работать дальше
+				CRC32MD5 = DataSignerCrc32(MD5)
+			}()
 
-	go func(wg *sync.WaitGroup, singleHashCh chan string) {
-		wg.Wait()
-		close(singleHashCh)
-	}(&wg, singleHashCh)
-
-	for singleHash := range singleHashCh {
-		out <- singleHash
-	}
-}
-
-// Calculate sum of hashes for SingleHash
-func calculateSingleHashSum(wg *sync.WaitGroup, out chan string, inputAsString string, inputAsMd5 string) {
-	hashFromInputCh := make(chan string)
-	hashFromMd5Ch := make(chan string)
-
-	go func(out chan string, input string) {
-		out <- DataSignerCrc32(input)
-	}(hashFromInputCh, inputAsString)
-
-	go func(out chan string, input string) {
-		out <- DataSignerCrc32(input)
-	}(hashFromMd5Ch, inputAsMd5)
-
-	hashFromInput := <- hashFromInputCh
-	hashFromMd5 := <- hashFromMd5Ch
-
-	out <- fmt.Sprintf("%v~%v", hashFromInput, hashFromMd5)
-	wg.Done()
-}
-
-func MultiHash(in, out chan interface{}) {
-	var wgOuter sync.WaitGroup
-	multiHashOuterCh := make(chan string)
-
-	for input := range in {
-		var wgInner sync.WaitGroup
-		inputAsString := convertToString(input)
-		multiHashInnerCh := make(chan HashNode)
-
-		wgOuter.Add(1)
-		wgInner.Add(multiHashSubHashes)
-		for i := 0; i < multiHashSubHashes; i++ {
-			go calculateInnerMultiHash(&wgInner, i, inputAsString, multiHashInnerCh)
-		}
-		go func(wgInner *sync.WaitGroup, multiHashInnerCh chan HashNode) {
-			wgInner.Wait()
-			close(multiHashInnerCh)
-		}(&wgInner, multiHashInnerCh)
-
-		go calculateOuterMultiHash(&wgOuter, multiHashInnerCh, multiHashOuterCh)
-	}
-
-	go func(wgOuter *sync.WaitGroup, multiHashCh chan string) {
-		wgOuter.Wait()
-		close(multiHashCh)
-	}(&wgOuter, multiHashOuterCh)
-
-	for multiHash := range multiHashOuterCh {
-		out <- multiHash
-	}
-}
-
-// Calculate multi hash for inner loop
-func calculateInnerMultiHash(wg *sync.WaitGroup, position int, input string, out chan HashNode) {
-	out <- HashNode{position, DataSignerCrc32(fmt.Sprintf("%v%v", position, input))}
-	wg.Done()
-}
-
-// Calculate multi hash for outer loop
-func calculateOuterMultiHash(wg *sync.WaitGroup, in chan HashNode, out chan string) {
-	hashNodes := map[int]string{}
-	var hashNodeKeys []int
-
-	for o := range in {
-		hashNodes[o.id] = o.value
-		hashNodeKeys = append(hashNodeKeys, o.id)
-	}
-	sort.Ints(hashNodeKeys)
-
-	var results []string
-	for i := range hashNodeKeys {
-		results = append(results, hashNodes[i])
-	}
-
-	out <- strings.Join(results, "")
-	wg.Done()
-}
-
-func CombineResults(in, out chan interface{}) {
-	var results []string
-
-	for input := range in {
-		inputAsString := convertToString(input)
-		results = append(results, inputAsString)
-	}
-
-	sort.Strings(results)
-	out <- strings.Join(results, "_")
-}
-
-// Convert interface{} to string
-func convertToString(input interface{}) string {
-	inputAsString, ok := input.(string)
-	if !ok {
-		fmt.Errorf("can't convert %T to string", input)
-	}
-
-	return inputAsString
-}
-
-// Convert interface{} to int
-func convertToInt(input interface{}) int {
-	inputAsInt, ok := input.(int)
-	if !ok {
-		fmt.Errorf("can't convert %T to int", input)
-	}
-
-	return inputAsInt
-}
-
-func ExecutePipeline(jobs ...job) {
-	var wg sync.WaitGroup
-	in := make(chan interface{})
-	out := make(chan interface{})
-
-	wg.Add(len(jobs))
-	for _, job := range jobs {
-		go runJob(&wg, job, in, out)
-
-		// Make `out` channel as `in` channel for next job
-		in = out
-		out = make(chan interface{})
+			CRC32 = DataSignerCrc32(digit)
+			wgCRC.Wait()
+			result := CRC32+"~"+CRC32MD5
+			workerOutput <- result
+		}(digit)
 	}
 	wg.Wait()
-	close(out)
 }
 
-// Run a specific job
-func runJob(wg *sync.WaitGroup, job job, in, out chan interface{}) {
-	job(in, out)
+func MultiHash(workerInput, workerOutput chan interface{}) {
+	wg := &sync.WaitGroup{}
 
-	wg.Done()
-	close(out)
+	for item := range workerInput {
+		data := item.(string)
+		wg.Add(1)
+
+		// out chan interface{}, wg *sync.WaitGroup,
+		go func(data string) {
+			defer wg.Done()
+			result := make([]string, 6)
+			wgCRC := &sync.WaitGroup{}
+
+			for th := 0; th < 6; th+=1 {
+				wgCRC.Add(1)
+
+				go func(th int) {
+					defer wgCRC.Done()
+					CRC32 := DataSignerCrc32(fmt.Sprint(th)+data)
+					result[th] = CRC32
+				}(th)
+			}
+
+			wgCRC.Wait()
+			workerOutput <- strings.Join(result, "")
+		}(data)
+	}
+
+	wg.Wait()
 }
+
+func CombineResults(workerInput, workerOutput chan interface{}) {
+	var result []string
+
+	for item := range workerInput {
+		data := item.(string)
+		result = append(result, data)
+	}
+	sort.Strings(result)
+	workerOutput <- strings.Join(result, "_")
+}
+
+func main(){}
