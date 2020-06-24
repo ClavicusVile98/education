@@ -1,5 +1,3 @@
-network
-
 
 ## Лабораторная работа #1
 **Задание 1**
@@ -12,7 +10,7 @@ network
 
 Схема сети:
 
-![network.png](../_resources/02bad8790a1d4b85a3500b88b0bd6896.png)
+![network.png](./_resources/02bad8790a1d4b85a3500b88b0bd6896.png)
 
 **Задание 2**
 
