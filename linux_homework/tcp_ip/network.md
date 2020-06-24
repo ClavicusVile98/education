@@ -56,17 +56,20 @@ broadcast: 192.168.0.15
 - в README приложить скриншоты tracepath и ip r.
 
 office1Server -> office2Server
+
 ![office1_office2.png](./_resources/82b7d2f35704485f9da66d633952f5f1.png)
 
 ![office1_ip_r.png](./_resources/9b984b5d29e14079be7ed999321355d0.png)
 
 
 office2Server -> office1Server
+
 ![office2_ip_r.png](./_resources/b4ae805943044897a6475c38bd9885ee.png)
 
 ![office2_office1.png](./_resources/a760f1498b74469789cde3641480192f.png)
 
 centralServer -> office1Server && office2Server 
+
 ![centrealServer.png](./_resources/71f7267993af4078b6e762741fb519cf.png)
 
 ![tracepath_central.png](./_resources/12bbf909c9244ff0b1ff865af5969507.png)
