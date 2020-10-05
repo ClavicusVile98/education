@@ -1,4 +1,4 @@
-Code-Bacics
+Code Basics
 
 Courses: HTML, CSS, JavaScript.
 
