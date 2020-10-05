@@ -1,4 +1,4 @@
-Code-Blocks
+Code-Bacics
 
 Courses: HTML, CSS, JavaScript.
 
