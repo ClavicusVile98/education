@@ -7,3 +7,5 @@ https://codepen.io/clavicusvile98
 ***CSS:Flex***
 
 https://codepen.io/clavicusvile98
+
+![hexlet_flex](hexlet_flex.jpg)
